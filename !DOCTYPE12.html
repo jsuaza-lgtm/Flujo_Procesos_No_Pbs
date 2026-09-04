@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Facturación CM · Gestión de soportes</title>
+<style>
+:root{
+ --bg:#f4f7fb;--surface:#fff;--surface2:#f8fafc;--text:#172033;--muted:#667085;
+ --line:#dbe2ea;--accent:#1769e0;--accent2:#0b4db3;--green:#14804a;--greenbg:#e9f8f0;
+ --orange:#b85c00;--orangebg:#fff3e5;--red:#c53030;--redbg:#fff0f0;
+ --shadow:0 14px 40px rgba(16,24,40,.08);--radius:18px
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body.dark{--bg:#0d1420;--surface:#131d2b;--surface2:#182435;--text:#edf2f7;--muted:#9eacbd;--line:#2b394c;--shadow:0 16px 45px rgba(0,0,0,.28)}
+button{font:inherit;cursor:pointer}.app{max-width:1500px;margin:auto;padding:28px}
+header{background:linear-gradient(135deg,#102a56,#1769e0);color:white;border-radius:24px;padding:30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+header:after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-90px;top:-120px;background:rgba(255,255,255,.08)}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.14em;font-weight:800;opacity:.8}
+h1{margin:8px 0 8px;font-size:32px;line-height:1.15}.subtitle{margin:0;max-width:900px;opacity:.86}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);padding:10px 14px;border-radius:11px;font-weight:700}
+header .btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:white}.btn:hover{transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}
+.metric{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.metric .num{font-size:27px;font-weight:850}.metric small{color:var(--muted);font-weight:650}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:22px}
+.panel h2{margin:0 0 5px;font-size:20px}.muted{color:var(--muted)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.filter{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface2);font-weight:750;color:var(--muted)}
+.filter.active{background:#e8f1ff;color:var(--accent);border-color:#b8d1fa}
+body.dark .filter.active{background:#17345e}
+.flow{position:relative;padding:12px 2px 10px}
+.step{display:grid;grid-template-columns:62px 1fr;gap:15px;position:relative;margin-bottom:14px}
+.step:not(:last-child):before{content:"";position:absolute;left:29px;top:55px;bottom:-14px;border-left:2px dashed var(--line)}
+.node{width:58px;height:58px;border-radius:17px;background:var(--accent);color:white;display:grid;place-items:center;font-weight:900;font-size:19px;z-index:1;box-shadow:0 7px 18px rgba(23,105,224,.2)}
+.card{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--surface2);transition:.2s;cursor:pointer}
+.card:hover,.card.selected{border-color:#80aef0;box-shadow:0 8px 25px rgba(23,105,224,.1);transform:translateY(-1px)}
+.card-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.card h3{margin:0;font-size:16px}.card p{margin:8px 0 0;color:var(--muted);line-height:1.5;font-size:14px}
+.tag{padding:5px 9px;border-radius:999px;font-size:11px;font-weight:850;white-space:nowrap}.auto{background:#e9f8f0;color:var(--green)}.manual{background:#fff3e5;color:var(--orange)}.decision{background:#eeeafd;color:#6941c6}
+body.dark .auto{background:#123525}.dark .manual{background:#3b2815}
+.branches{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.branch{border:1px solid var(--line);padding:12px;border-radius:12px;font-size:13px;color:var(--muted)}.branch.alert{background:var(--redbg);border-color:#f1b4b4}.branch b{display:block;color:var(--text);margin-bottom:4px}
+.states{display:flex;align-items:stretch;gap:8px;margin:14px 0;overflow:auto}.state{min-width:170px;border:1px solid var(--line);border-radius:14px;padding:13px;background:var(--surface2)}.state .owner{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}.state strong{display:block;margin:5px 0}.state small{color:var(--muted)}.arrow{display:grid;place-items:center;color:var(--muted);font-size:22px}
+.side-section{padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--line)}.side-section:last-child{border:0;margin:0;padding:0}
+.detail-icon{font-size:30px}.detail h3{margin:6px 0}.detail p{color:var(--muted);line-height:1.55}.rule{background:var(--surface2);border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:10px;font-size:13px}
+.progress{height:9px;background:var(--line);border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:var(--accent);transition:.35s}
+.sim-controls{display:flex;gap:8px;margin-top:12px}.sim-controls button{flex:1}.history{margin-top:12px;max-height:190px;overflow:auto}.history div{padding:8px 0;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.toast{position:fixed;right:22px;bottom:22px;background:#162238;color:white;padding:13px 17px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:none}
+.presentation .app{max-width:1800px}.presentation .side{display:none}.presentation .layout{grid-template-columns:1fr}.presentation .card p{font-size:15px}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.app{padding:12px}header{padding:22px}h1{font-size:25px}.grid{grid-template-columns:1fr 1fr}.step{grid-template-columns:48px 1fr}.node{width:45px;height:45px;border-radius:14px}.step:not(:last-child):before{left:22px}.branches{grid-template-columns:1fr}}
+@media print{body{background:white}.toolbar,.filters,.side,.metric{display:none!important}.app{max-width:none;padding:0}.layout{display:block}.panel,header{box-shadow:none}.card{break-inside:avoid}header{color:#111;background:white;border:1px solid #ddd}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="eyebrow">Facturación CM · Gestión de soportes</div>
+  <h1>De la recepción del soporte a la factura</h1>
+  <p class="subtitle">Flujo operativo interactivo para visualizar responsables, automatizaciones, decisiones, estados y puntos de control.</p>
+  <div class="toolbar">
+    <button class="btn" onclick="simulate()">▶ Simular proceso</button>
+    <button class="btn" onclick="togglePause()" id="pauseBtn">Ⅱ Pausar</button>
+    <button class="btn" onclick="resetFlow()">↺ Reiniciar</button>
+    <button class="btn" onclick="toggleDark()">◐ Tema</button>
+    <button class="btn" onclick="togglePresentation()">▣ Presentación</button>
+    <button class="btn" onclick="window.print()">⎙ Imprimir</button>
+  </div>
+</header>
+
+<div class="grid">
+  <div class="metric"><small>ETAPAS</small><div class="num">9</div><small>del flujo principal</small></div>
+  <div class="metric"><small>AUTOMÁTICAS</small><div class="num">4</div><small>scripts / correos / traslado</small></div>
+  <div class="metric"><small>MANUALES</small><div class="num">4</div><small>intervención de equipos</small></div>
+  <div class="metric"><small>VALIDACIÓN</small><div class="num">10 min</div><small>frecuencia automática</small></div>
+</div>
+
+<div class="layout">
+<main>
+<section class="panel">
+  <h2>Estados clave</h2><div class="muted">Ruta principal del registro</div>
+  <div class="states">
+    <div class="state"><span class="owner">Facturación</span><strong>Listo cierre Id</strong><small>Revisado y listo para avanzar</small></div>
+    <div class="arrow">→</div>
+    <div class="state"><span class="owner">Sistema / Negocio</span><strong>Pendiente Cierre Id</strong><small>En cola para cierre</small></div>
+    <div class="arrow">→</div>
+    <div class="state"><span class="owner">Negocio</span><strong>Ok Cerrado Id</strong><small>Parte de Negocio resuelta</small></div>
+    <div class="arrow">→</div>
+    <div class="state"><span class="owner">Facturación</span><strong>Facturado</strong><small>Factura generada</small></div>
+  </div>
+</section>
+
+<section class="panel" style="margin-top:18px">
+  <h2>Flujo operativo</h2>
+  <div class="muted">Haz clic en cualquier etapa para ver el detalle.</div>
+  <div class="filters">
+    <button class="filter active" data-filter="all">Todo</button>
+    <button class="filter" data-filter="auto">Automático</button>
+    <button class="filter" data-filter="manual">Manual</button>
+    <button class="filter" data-filter="decision">Decisión</button>
+  </div>
+  <div class="flow" id="flow"></div>
+</section>
+</main>
+
+<aside class="panel side">
+  <div class="side-section detail" id="detail">
+    <div class="detail-icon">◎</div>
+    <h3>Selecciona una etapa</h3>
+    <p>Haz clic sobre una tarjeta del flujo para consultar su propósito, responsable y comportamiento.</p>
+  </div>
+  <div class="side-section">
+    <h2>Simulación</h2>
+    <div class="muted">Progreso del caso</div>
+    <div class="progress" style="margin-top:10px"><div class="bar" id="bar"></div></div>
+    <div class="sim-controls">
+      <button class="btn" onclick="prevStep()">←</button>
+      <button class="btn" onclick="nextStep()">→</button>
+    </div>
+    <div class="history" id="history"></div>
+  </div>
+  <div class="side-section">
+    <h2>Regla crítica</h2>
+    <div class="rule"><b>Facturado</b><br>Solo se alcanza después de que Facturación genera la factura a partir del estado <b>Ok Cerrado Id</b>.</div>
+  </div>
+  <div>
+    <h2>Validación automática</h2>
+    <div class="rule">Cada 10 minutos: <b>Estado = Listo cierre id</b> + plan permitido:<br><br>• Mipres Nacional<br>• Tutela Nacional<br>• Tutela Bogotá</div>
+  </div>
+</aside>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const steps=[
+{n:1,type:'manual',title:'Recepción de soportes',tag:'Manual',icon:'01',desc:'La sede o responsable diligencia el formulario con la información del caso y adjunta los soportes.',owner:'Sede / Responsable',result:'Registro recibido con soportes.'},
+{n:2,type:'auto',title:'Consolidación del registro',tag:'Automático',icon:'02',desc:'Al enviarse el formulario, el script onFormSubmit organiza la información, oculta columnas duplicadas y asigna un número de recepción único.',owner:'Sistema',result:'ID de recepción: OCMK-00001, OCMK-00002…'},
+{n:3,type:'auto',title:'Confirmación de recepción',tag:'Automático',icon:'03',desc:'Se envía un correo al responsable confirmando la recepción de los soportes, con el detalle del caso y enlaces a los archivos.',owner:'Sistema / Correo',result:'Responsable notificado.'},
+{n:4,type:'decision',title:'Revisión por Facturación',tag:'Manual · Decisión',icon:'04',desc:'Facturación revisa los soportes y determina si la documentación está completa y correcta.',owner:'Facturación',result:'Si está completo → Listo cierre Id. Si falta algo → Devuelto.'},
+{n:5,type:'decision',title:'Validación automática de elegibilidad',tag:'Cada 10 min · Decisión',icon:'05',desc:'El sistema valida periódicamente si el registro cumple las condiciones para ser trasladado a Negocio.',owner:'Sistema',result:'Estado Listo cierre id + plan permitido.'},
+{n:6,type:'auto',title:'Traslado a Negocio Asignación',tag:'Automático',icon:'06',desc:'El sistema copia los datos relevantes, organiza los soportes en la carpeta compartida por número de recepción y marca el registro como notificado en el origen.',owner:'Sistema',result:'Nuevo estado: Pendiente Cierre Id.'},
+{n:7,type:'manual',title:'Cierre por Negocio',tag:'Manual',icon:'07',desc:'Negocio revisa el registro y los soportes disponibles y actualiza el caso cuando su gestión queda resuelta.',owner:'Negocio',result:'Estado: Ok Cerrado Id.'},
+{n:8,type:'manual',title:'Generación de factura',tag:'Manual',icon:'08',desc:'Facturación identifica los casos en Ok Cerrado Id, genera la factura y registra el número de factura.',owner:'Facturación',result:'Estado: Facturado.'},
+{n:9,type:'auto',title:'Correo final de confirmación',tag:'Automático',icon:'09',desc:'Se envía al responsable el correo de confirmación con el número de factura generado.',owner:'Sistema / Correo',result:'Proceso cerrado y responsable informado.'}
+];
+
+let current=-1,playing=false,timer=null,filter='all';
+
+function render(){
+ const flow=document.getElementById('flow'); flow.innerHTML='';
+ steps.forEach((s,i)=>{
+  if(filter!=='all' && s.type!==filter)return;
+  const el=document.createElement('div'); el.className='step';
+  el.innerHTML=`<div class="node">${s.icon}</div><div class="card ${i===current?'selected':''}" data-i="${i}">
+   <div class="card-top"><h3>${s.title}</h3><span class="tag ${s.type}">${s.tag}</span></div>
+   <p>${s.desc}</p>
+   ${i===3?`<div class="branches"><div class="branch alert"><b>NO · Devuelto</b>Se registra motivo y observación, se solicita corrección y el caso vuelve a revisión.</div><div class="branch"><b>SÍ · Listo cierre Id</b>El caso queda habilitado para la validación automática.</div></div>`:''}
+   ${i===4?`<div class="branches"><div class="branch"><b>SÍ cumple</b>Continúa al traslado a Negocio.</div><div class="branch alert"><b>NO cumple</b>Permanece en la hoja de origen hasta actualizarse.</div></div>`:''}
+  </div>`;
+  el.querySelector('.card').onclick=()=>selectStep(i);
+  flow.appendChild(el);
+ });
+ document.getElementById('bar').style.width=current<0?'0':((current+1)/steps.length*100)+'%';
+}
+function selectStep(i){
+ current=i; render();
+ const s=steps[i];
+ document.getElementById('detail').innerHTML=`<div class="detail-icon">${s.icon}</div><span class="tag ${s.type}">${s.tag}</span><h3>${s.title}</h3><p>${s.desc}</p><div class="rule"><b>Responsable</b><br>${s.owner}</div><div class="rule"><b>Resultado</b><br>${s.result}</div>`;
+ toast('Etapa '+(i+1)+' seleccionada');
+}
+function nextStep(){ if(current<steps.length-1)selectStep(current+1); else stopSim(); }
+function prevStep(){ if(current>0)selectStep(current-1); }
+function simulate(){ if(playing)return; current=-1; playing=true; document.getElementById('pauseBtn').textContent='Ⅱ Pausar'; history('▶ Simulación iniciada'); nextStep(); timer=setInterval(()=>{if(playing)nextStep()},1800); }
+function togglePause(){playing=!playing;document.getElementById('pauseBtn').textContent=playing?'Ⅱ Pausar':'▶ Continuar';history(playing?'▶ Simulación continúa':'Ⅱ Simulación pausada')}
+function stopSim(){playing=false;clearInterval(timer);document.getElementById('pauseBtn').textContent='Ⅱ Pausar';history('✓ Simulación finalizada')}
+function resetFlow(){clearInterval(timer);playing=false;current=-1;document.getElementById('pauseBtn').textContent='Ⅱ Pausar';document.getElementById('detail').innerHTML='<div class="detail-icon">◎</div><h3>Selecciona una etapa</h3><p>Haz clic sobre una tarjeta del flujo para consultar el detalle.</p>';document.getElementById('history').innerHTML='';render();toast('Flujo reiniciado')}
+function history(t){const h=document.getElementById('history');const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})+' · '+t;h.prepend(d)}
+function toggleDark(){document.body.classList.toggle('dark');localStorage.setItem('fc-dark',document.body.classList.contains('dark'))}
+function togglePresentation(){document.body.classList.toggle('presentation');toast(document.body.classList.contains('presentation')?'Modo presentación activado':'Modo presentación desactivado')}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1500)}
+document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.filter;render()});
+if(localStorage.getItem('fc-dark')==='true')document.body.classList.add('dark');
+render();
+</script>
+</body>
+</html>
